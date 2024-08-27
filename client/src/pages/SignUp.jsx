@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from 'react'
+import OAuth from '../components/OAuth';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -12,7 +13,6 @@ export default function SignUp() {
       ...formData,
       [e.target.id]: e.target.value,
     });
-    console.log(formData)
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +26,6 @@ export default function SignUp() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data);
       if (data.success === false) {
         setLoading(false);
         setError(data.message);
@@ -53,9 +52,10 @@ export default function SignUp() {
           onChange={handleChange} />
         <button disabled={loading}
           className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>{loading ? 'Loading...' : 'Sign Up'}</button>
+          <OAuth/>
         <div className='flex gap-2 '>
           <p>Have an account?</p>
-          <Link to={'sign-in'}>
+          <Link to={'/sign-in'}>
             <span className='text-blue-800'> Sign in</span>
           </Link>
         </div>
