@@ -35,12 +35,10 @@ export const signin = async (req, res, next) => {
 
 export const google = async (req, res, next) => {
   try {
-    console.log('Request body:', req.body);
 
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      console.log(user._id)
       const { password: pass, ...rest } = user._doc;
       res
         .cookie('access_token', token, { httpOnly: true })
@@ -55,7 +53,7 @@ export const google = async (req, res, next) => {
         password: hashedPassword,
         avatar: req.body.photo,
       });
-      
+
       await newUser.save();
 
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
@@ -70,4 +68,13 @@ export const google = async (req, res, next) => {
     res.status(500).json({ message: 'Internal Server Error' }); // Send error response
   }
 };
+
+export const signout = async (req, res, next) => {
+  try {
+    res.clearCookie('access_token');
+    res.status(200).json("user has been logged out");
+  } catch (error) {
+    next(error);
+  }
+}
 
