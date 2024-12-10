@@ -12,7 +12,7 @@ import {
   userSignoutStart,
   userSignoutSuccess,
   userSignoutFailure
-} from '../../Redux/user/userSlice'
+} from '../../redux/user/userSlice.js';
 import { errorHandler } from '../../../api/utils/error'
 
 export default function Profile() {
