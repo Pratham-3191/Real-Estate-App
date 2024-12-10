@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useState } from 'react'
 import {useDispatch} from 'react-redux'
 import { useSelector } from 'react-redux'
-import { signInStart,signInSuccess,signInFailure } from '../../Redux/user/userSlice'
+import { signInStart,signInSuccess,signInFailure } from '../../redux/user/userSlice.js'
 import OAuth from '../components/OAuth'
 
 export default function SignIn() {
