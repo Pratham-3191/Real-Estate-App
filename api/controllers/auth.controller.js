@@ -64,8 +64,8 @@ export const google = async (req, res, next) => {
         .json(rest);
     }
   } catch (error) {
-    console.error('Error during Google sign-in:', error); // Log error details
-    res.status(500).json({ message: 'Internal Server Error' }); // Send error response
+    console.error('Error during Google sign-in:', error);
+    res.status(500).json({ message: 'Internal Server Error' }); 
   }
 };
 

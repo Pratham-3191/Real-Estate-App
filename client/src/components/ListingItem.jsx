@@ -14,7 +14,7 @@ export default function ListingItem({ listing }) {
           <p className='truncate'>{listing.description}</p>
           <p className='text-lg'>
             ₹{listing.offer && listing.discountedPrice ?
-              (listing.discountedPrice) : (listing.regularPrice)}/month</p>
+              (listing.discountedPrice) : (listing.regularPrice)}{listing.type=="rent"?"/month":""}</p>
           <div className='flex flex-row text-sm gap-6'>
             <p>{`${listing.bedrooms} ${listing.bedrooms > 1 ? 'beds' : 'bed'}`}</p>
             <p>{`${listing.bathrooms} ${listing.bathrooms > 1 ? 'baths' : 'bath'}`}</p>
