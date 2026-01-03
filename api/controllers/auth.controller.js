@@ -24,8 +24,11 @@ export const signin = async (req, res, next) => {
     if (!validPassword) return next(errorHandler(401, 'Wrong credentials!'))
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
     const { password: pass, ...rest } = validUser._doc;
-    res
-      .cookie('access_token', token, { httpOnly: true })
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    })
       .status(200)
       .json(rest)
   } catch (error) {
@@ -65,7 +68,7 @@ export const google = async (req, res, next) => {
     }
   } catch (error) {
     console.error('Error during Google sign-in:', error);
-    res.status(500).json({ message: 'Internal Server Error' }); 
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 

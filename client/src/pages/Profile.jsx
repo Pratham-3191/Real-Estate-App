@@ -85,7 +85,9 @@ export default function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingError(false)
-      const res = await fetch(`${BASE_URL}/api/user/listings/${currentUser._id}`)
+      const res = await fetch(`${BASE_URL}/api/user/listings/${currentUser._id}`, {
+        credentials: 'include',
+      })
       const data = await res.json();
       if (data.success === false) {
         setShowListingError(true)
@@ -100,7 +102,7 @@ export default function Profile() {
     try {
       const res = await fetch(`${BASE_URL}/api/listing/delete/${listingId}`, {
         method: 'DELETE',
-          credentials: 'include',
+        credentials: 'include',
       })
       const data = await res.json();
       if (data.success === false) {
