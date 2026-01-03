@@ -36,6 +36,7 @@ export default function Profile() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
       const data = await res.json();
@@ -55,6 +56,7 @@ export default function Profile() {
       dispatch(userDeleteStart());
       const res = await fetch(`${BASE_URL}/api/user/delete/${currentUser._id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success === false) {
@@ -98,6 +100,7 @@ export default function Profile() {
     try {
       const res = await fetch(`${BASE_URL}/api/listing/delete/${listingId}`, {
         method: 'DELETE',
+          credentials: 'include',
       })
       const data = await res.json();
       if (data.success === false) {
