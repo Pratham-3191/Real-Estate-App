@@ -110,7 +110,7 @@ export default function CreateListing() {
       if (+formData.discountedPrice > +formData.regularPrice) return setError("your discounted price must be less than regular price")
       setLoading(true)
       setError(false)
-      const res = await fetch('/api/listing/create', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/listing/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -22,6 +22,7 @@ export default function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const { currentUser, loading, error } = useSelector((state) => state.user)
   const [showListingError, setShowListingError] = useState(false);
+  const BASE_URL = import.meta.env.VITE_API_URL;
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -30,7 +31,7 @@ export default function Profile() {
     e.preventDefault();
     try {
       dispatch(userUpdateStart());
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      const res = await fetch(`${BASE_URL}/api/user/update/${currentUser._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ export default function Profile() {
   const handleDeleteUser = async () => {
     try {
       dispatch(userDeleteStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+      const res = await fetch(`${BASE_URL}/api/user/delete/${currentUser._id}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -68,7 +69,7 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(userSignoutStart())
-      const res = await fetch(`/api/auth/signout`)
+      const res = await fetch(`${BASE_URL}/api/auth/signout`)
       const data = await res.json();
       if (data.success === false) {
         dispatch(userSignoutFailure(data.message))
@@ -82,7 +83,7 @@ export default function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingError(false)
-      const res = await fetch(`/api/user/listings/${currentUser._id}`)
+      const res = await fetch(`${BASE_URL}/api/user/listings/${currentUser._id}`)
       const data = await res.json();
       if (data.success === false) {
         setShowListingError(true)
@@ -95,7 +96,7 @@ export default function Profile() {
   }
   const handleListingDelete = async (listingId) => {
     try {
-      const res = await fetch(`/api/listing/delete/${listingId}`, {
+      const res = await fetch(`${BASE_URL}/api/listing/delete/${listingId}`, {
         method: 'DELETE',
       })
       const data = await res.json();
