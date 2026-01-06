@@ -8,14 +8,19 @@ export const test = (req, res) => {
     message: "Api route"
   })
 }
+
 export const updateUser = async (req, res, next) => {
+  // Only allow users to update their own account
   if (req.user.id !== req.params.id)
-    return next(errorHandler(401, 'You can only update your own account!'));
+    return next(errorHandler(401, "You can only update your own account!"));
+
   try {
+    // Hash password if provided
     if (req.body.password) {
       req.body.password = bcryptjs.hashSync(req.body.password, 10);
     }
 
+    // Update user
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -25,17 +30,26 @@ export const updateUser = async (req, res, next) => {
           password: req.body.password,
         },
       },
-      { new: true }
+      { new: true, runValidators: true } // runValidators ensures schema validation
     );
 
     const { password, ...rest } = updatedUser._doc;
 
     res.status(200).json(rest);
   } catch (error) {
+    // Check for duplicate key error
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyValue)[0];
+      return next(
+        errorHandler(
+          400,
+         "User already exists"
+        )
+      );
+    }
     next(error);
   }
 };
-
 export const deleteUser = async (req, res, next) => {
   if (req.user.id !== req.params.id)
     return next(errorHandler(401, 'You can only delete your own account!'));

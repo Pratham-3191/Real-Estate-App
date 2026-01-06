@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { useSelector } from 'react-redux';
@@ -10,140 +10,158 @@ import {
   FaBath,
   FaBed,
   FaChair,
-  FaMapMarkedAlt,
   FaMapMarkerAlt,
   FaParking,
   FaShare,
 } from 'react-icons/fa';
 
 export default function Listing() {
-  SwiperCore.use([Navigation])
-  const params = useParams()
-  const [copied, setCopied] = useState(false)
-  const [listing, setListing] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
-  const {currentUser}=useSelector((state)=> state.user)
-  const[contact,setContact]=useState(false);
+  SwiperCore.use([Navigation]);
+  const params = useParams();
+  const { currentUser } = useSelector((state) => state.user);
+
+  const [copied, setCopied] = useState(false);
+  const [listing, setListing] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [contact, setContact] = useState(false);
+
   useEffect(() => {
     const fetchListing = async () => {
       try {
-        setLoading(true)
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/listing/get/${params.listingId}`)
+        setLoading(true);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/listing/get/${params.listingId}`
+        );
         const data = await res.json();
         if (data.success === false) {
           setError(true);
           setLoading(false);
           return;
         }
-        setListing(data)
-        setLoading(false)
-        console.log(data)
-        setError(false)
-
+        setListing(data);
+        setLoading(false);
+        setError(false);
       } catch (error) {
         setError(true);
         setLoading(false);
       }
-    }
-    fetchListing()
-  }, [params.listingId])
+    };
+    fetchListing();
+  }, [params.listingId]);
+
   return (
-    <main>
-      {loading && <div className='text-centre my-7 text-2xl'>Loading...</div>}
-      {error && <p className='text-centre my-7 text-2xl'>Something went wrong</p>}
-      {listing && !loading && !error &&
-        <div>
-          <Swiper navigation>
-            {listing.imageUrls.map((url) => (
-              <SwiperSlide key={url}>
-                <div
-                  className='h-[550px]'
-                  style={{
-                    background: `url(${url}) center no-repeat`,
-                    backgroundSize: 'contain',
-                  }}
-                ></div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          <div className='fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
-            <FaShare
-              className='text-slate-500'
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                setCopied(true);
-                setTimeout(() => {
-                  setCopied(false);
-                }, 2000);
-              }}
-            />
+    <main className="bg-slate-100 min-h-screen">
+      {loading && (
+        <div className="text-center my-7 text-2xl text-slate-700">Loading...</div>
+      )}
+      {error && (
+        <p className="text-center my-7 text-2xl text-red-600">
+          Something went wrong
+        </p>
+      )}
+      {listing && !loading && !error && (
+        <div className="max-w-6xl mx-auto p-4 md:p-6 flex flex-col gap-6">
+
+          {/* SWIPER / IMAGE GALLERY */}
+          <div className="relative">
+            <Swiper navigation>
+              {listing.imageUrls.map((url, idx) => (
+                <SwiperSlide key={idx}>
+                  <div
+                    className="h-64 md:h-[550px] rounded-lg overflow-hidden bg-center bg-no-repeat bg-cover"
+                    style={{ backgroundImage: `url(${url})` }}
+                  ></div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {/* SHARE BUTTON */}
+            <div className="absolute top-3 right-3 z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-white shadow cursor-pointer">
+              <FaShare
+                className="text-slate-600"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              />
+            </div>
+
+            {copied && (
+              <p className="absolute top-16 right-5 z-10 bg-white px-3 py-1 rounded shadow text-sm text-slate-700">
+                Link copied!
+              </p>
+            )}
           </div>
-          {copied && (
-            <p className='fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2'>
-              Link copied!
-            </p>
-          )}
-          <div className='flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4'>
-            <p className='text-2xl font-semibold'>
+
+          {/* LISTING DETAILS */}
+          <div className="flex flex-col gap-4 p-3 bg-white rounded-xl shadow-sm">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
               {listing.name} - ₹{' '}
               {listing.offer
-  ? (listing.discountedPrice ? listing.discountedPrice.toLocaleString('en-US') : 'N/A')
-  : (listing.regularPrice ? listing.regularPrice.toLocaleString('en-US') : 'N/A')}
-
+                ? (listing.discountedPrice ?? 'N/A').toLocaleString('en-US')
+                : (listing.regularPrice ?? 'N/A').toLocaleString('en-US')}
               {listing.type === 'rent' && ' / month'}
-            </p>
-            <p className='flex items-center mt-6 gap-2 text-slate-600  text-sm'>
-              <FaMapMarkerAlt className='text-green-700' />
+            </h1>
+
+            {/* ADDRESS */}
+            <p className="flex items-center gap-2 text-slate-600 text-sm md:text-base">
+              <FaMapMarkerAlt className="text-green-600" />
               {listing.address}
             </p>
-            <div className='flex gap-4'>
-              <p className='bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
+
+            {/* TYPE & OFFER */}
+            <div className="flex flex-wrap gap-3 mt-2">
+              <span className="bg-red-600 text-white px-3 py-1 rounded-md text-sm md:text-base">
                 {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
-              </p>
+              </span>
               {listing.offer && (
-                <p className='bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
+                <span className="bg-green-600 text-white px-3 py-1 rounded-md text-sm md:text-base">
                   {+listing.regularPrice - +listing.discountedPrice} OFF
-                </p>
+                </span>
               )}
             </div>
-            <p className='text-slate-800'>
-              <span className='font-semibold text-black'>Description - </span>
+
+            {/* DESCRIPTION */}
+            <p className="text-slate-700 text-base md:text-lg mt-3">
+              <span className="font-semibold text-slate-800">Description: </span>
               {listing.description}
             </p>
-            <ul className='text-green-900 font-semibold text-sm flex flex-wrap items-center gap-4 sm:gap-6'>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaBed className='text-lg' />
-                {listing.bedrooms > 1
-                  ? `${listing.bedrooms} beds `
-                  : `${listing.bedrooms} bed `}
+
+            {/* FEATURES */}
+            <ul className="flex flex-wrap gap-4 text-sm md:text-base font-semibold text-slate-700 mt-3">
+              <li className="flex items-center gap-1">
+                <FaBed className="text-lg md:text-xl" />
+                {listing.bedrooms} {listing.bedrooms > 1 ? 'beds' : 'bed'}
               </li>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaBath className='text-lg' />
-                {listing.bathrooms > 1
-                  ? `${listing.bathrooms} baths `
-                  : `${listing.bathrooms} bath `}
+              <li className="flex items-center gap-1">
+                <FaBath className="text-lg md:text-xl" />
+                {listing.bathrooms} {listing.bathrooms > 1 ? 'baths' : 'bath'}
               </li>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaParking className='text-lg' />
+              <li className="flex items-center gap-1">
+                <FaParking className="text-lg md:text-xl" />
                 {listing.parking ? 'Parking spot' : 'No Parking'}
               </li>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaChair className='text-lg' />
+              <li className="flex items-center gap-1">
+                <FaChair className="text-lg md:text-xl" />
                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
               </li>
             </ul>
+
+            {/* CONTACT LANDLORD */}
             {currentUser && listing.userRef !== currentUser._id && !contact && (
               <button
                 onClick={() => setContact(true)}
-                className='bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3'
+                className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 py-3 mt-4 text-base md:text-lg"
               >
-                Contact landlord
+                Contact Landlord
               </button>
             )}
-            {contact && <Contact listing={listing}/>}
+            {contact && <Contact listing={listing} />}
           </div>
-        </div>}
+        </div>
+      )}
     </main>
-  )
+  );
 }

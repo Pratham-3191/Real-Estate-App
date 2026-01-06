@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import SwiperCore from 'swiper';
+import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css/bundle';
 import ListingItem from '../components/ListingItem';
 
@@ -10,127 +9,162 @@ function Home() {
   const [offerListings, setOfferListings] = useState([]);
   const [saleListings, setSaleListings] = useState([]);
   const [rentListings, setRentListings] = useState([]);
-  console.log(rentListings);
+
   useEffect(() => {
     const fetchOfferListings = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/listing/get?offer=true&limit=4`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/listing/get?offer=true&limit=4`
+        );
         const data = await res.json();
-        setOfferListings(data)
+        setOfferListings(data);
         fetchRentListings();
-
       } catch (error) {
         console.error(error);
       }
-    }
+    };
 
     const fetchRentListings = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/listing/get?type=rent&limit=4`)
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/listing/get?type=rent&limit=4`
+        );
         const data = await res.json();
-        setRentListings(data)
-        fetchSaleListings()
+        setRentListings(data);
+        fetchSaleListings();
       } catch (error) {
-        console.log(error)
+        console.error(error);
       }
-    }
+    };
 
     const fetchSaleListings = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/listing/get?type=sale&limit=4`)
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/listing/get?type=sale&limit=4`
+        );
         const data = await res.json();
-        setSaleListings(data)
+        setSaleListings(data);
       } catch (error) {
-        console.log(error)
+        console.error(error);
       }
-    }
-    fetchOfferListings()
-  }, [])
+    };
+
+    fetchOfferListings();
+  }, []);
+
   return (
-    <div>
-      <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto'>
-        <h1 className='text-slate-700 font-bold text-3xl lg:text-6xl'>
-          Find your next <span className='text-slate-500'>perfect</span>
-          <br />
-          place with ease
-        </h1>
-        <div className='text-gray-400 text-xs sm:text-sm'>
-          Sahand Estate is the best place to find your next perfect place to
-          live.
-          <br />CX
-          We have a wide range of properties for you to choose from.
+    <div className="bg-slate-50">
+      {/* ================= HERO SECTION ================= */}
+      <div className="relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 py-24 flex flex-col gap-6 text-center">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-800">
+            Find your next{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-500 to-slate-700">
+              perfect
+            </span>{" "}
+            place
+          </h1>
+
+          <p className="text-gray-500 max-w-2xl mx-auto">
+            World Estate helps you discover the best homes for rent and sale
+            with ease. Trusted listings, verified sellers, and great deals.
+          </p>
+
+          <Link
+            to="/search"
+            className="inline-block mx-auto bg-slate-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-800 transition"
+          >
+            Start Exploring
+          </Link>
         </div>
-        <Link
-          to={'/search'}
-          className='text-xs sm:text-sm text-blue-800 font-bold hover:underline'
-        >
-          Let's get started...
-        </Link>
       </div>
 
-
-      <Swiper navigation>
-        {offerListings &&
-          offerListings.length > 0 &&
-          offerListings.map((listing) => (
-            <SwiperSlide>
+      {/* ================= SWIPER ================= */}
+      {offerListings.length > 0 && (
+        <Swiper
+          modules={[Navigation, Autoplay]}
+          navigation
+          autoplay={{ delay: 3000 }}
+          className="mb-14"
+        >
+          {offerListings.map((listing) => (
+            <SwiperSlide key={listing._id}>
               <div
+                className="h-[450px] bg-center bg-cover relative"
                 style={{
-                  background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                  backgroundSize: 'contain',
+                  backgroundImage: `url(${listing.imageUrls[0]})`,
                 }}
-                className='h-[500px]'
-                key={listing._id}
-              ></div>
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-6 left-6 text-white">
+                  <h2 className="text-xl font-semibold">{listing.name}</h2>
+                  <p className="text-sm opacity-90">
+                    ₹{listing.regularPrice?.toLocaleString()}
+                  </p>
+                </div>
+              </div>
             </SwiperSlide>
           ))}
-      </Swiper>
+        </Swiper>
+      )}
 
+      {/* ================= LISTING SECTIONS ================= */}
+      <div className="max-w-6xl mx-auto px-4 flex flex-col gap-16 pb-20">
+        {/* OFFERS */}
+        {offerListings.length > 0 && (
+          <Section
+            title="Recent Offers"
+            link="/search?offer=true"
+            linkText="View all offers"
+            listings={offerListings}
+          />
+        )}
 
-      <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 my-10'>
-        {offerListings && offerListings.length > 0 && (
-          <div className=''>
-            <div className='my-3'>
-              <h2 className='text-2xl font-semibold text-slate-600'>Recent offers</h2>
-              <Link className='text-sm text-blue-800 hover:underline' to={'/search?offer=true'}>Show more offers</Link>
-            </div>
-            <div className='flex flex-wrap gap-4'>
-              {offerListings.map((listing) => (
-                <ListingItem listing={listing} key={listing._id} />
-              ))}
-            </div>
-          </div>
+        {/* RENT */}
+        {rentListings.length > 0 && (
+          <Section
+            title="Places for Rent"
+            link="/search?type=rent"
+            linkText="View rentals"
+            listings={rentListings}
+          />
         )}
-        {rentListings && rentListings.length > 0 && (
-          <div className=''>
-            <div className='my-3'>
-              <h2 className='text-2xl font-semibold text-slate-600'>Recent places for rent</h2>
-              <Link className='text-sm text-blue-800 hover:underline' to={'/search?type=rent'}>Show more places for rent</Link>
-            </div>
-            <div className='flex flex-wrap gap-4'>
-              {rentListings.map((listing) => (
-                <ListingItem listing={listing} key={listing._id} />
-              ))}
-            </div>
-          </div>
-        )}
-        {saleListings && saleListings.length > 0 && (
-          <div className=''>
-            <div className='my-3'>
-              <h2 className='text-2xl font-semibold text-slate-600'>Recent places for sale</h2>
-              <Link className='text-sm text-blue-800 hover:underline' to={'/search?type=sale'}>Show more places for sale</Link>
-            </div>
-            <div className='flex flex-wrap gap-4'>
-              {saleListings.map((listing) => (
-                <ListingItem listing={listing} key={listing._id} />
-              ))}
-            </div>
-          </div>
+
+        {/* SALE */}
+        {saleListings.length > 0 && (
+          <Section
+            title="Places for Sale"
+            link="/search?type=sale"
+            linkText="View properties"
+            listings={saleListings}
+          />
         )}
       </div>
     </div>
-  )
+  );
 }
 
+/* ================= REUSABLE SECTION COMPONENT ================= */
+function Section({ title, link, linkText, listings }) {
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold text-slate-700">{title}</h2>
+        <Link
+          to={link}
+          className="text-sm text-blue-700 hover:underline font-medium"
+        >
+          {linkText}
+        </Link>
+      </div>
 
-export default Home
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {listings.map((listing) => (
+          <ListingItem key={listing._id} listing={listing}  />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Home;
